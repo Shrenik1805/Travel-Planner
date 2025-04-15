@@ -1,0 +1,114 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>Budget Planner</h1>
+
+<div class="card">
+    <div class="card-header">
+        <h2>Plan Your Budget</h2>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('budget.budget') }}">
+            <div class="form-group">
+                <label for="trip_id">Select Trip:</label>
+                <select id="trip_id" name="trip_id" class="form-control" required>
+                    <option value="" disabled selected>-- Choose a Trip --</option>
+                    {% for trip in trips %}
+                    <option value="{{ trip.id }}">{{ trip.trip_name }} ({{ trip.destination }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="total_budget">Total Budget:</label>
+                <input type="number" id="total_budget" name="total_budget" class="form-control" step="0.01" min="0" required placeholder="e.g., 1500.00">
+            </div>
+
+            <div id="budget-categories">
+                <label>Budget Categories:</label>
+                <div class="budget-category-item">
+                    <input type="text" name="category[]" class="form-control" placeholder="Category Name (e.g., Flights)" required>
+                    <input type="number" name="amount[]" class="form-control" step="0.01" min="0" placeholder="Amount" required>
+                </div>
+                 <div class="budget-category-item">
+                    <input type="text" name="category[]" class="form-control" placeholder="Category Name (e.g., Accommodation)">
+                    <input type="number" name="amount[]" class="form-control" step="0.01" min="0" placeholder="Amount">
+                </div>
+                 <div class="budget-category-item">
+                    <input type="text" name="category[]" class="form-control" placeholder="Category Name (e.g., Food)">
+                    <input type="number" name="amount[]" class="form-control" step="0.01" min="0" placeholder="Amount">
+                </div>
+                <!-- Add more static fields or use JavaScript to add dynamically -->
+            </div>
+            <!-- Optional: Button to add more categories via JS -->
+            <!-- <button type="button" id="add-category-btn" class="btn btn-secondary btn-sm">Add Category</button> -->
+
+            <button type="submit" class="btn btn-primary mt-3">Save/Update Budget</button>
+        </form>
+    </div>
+</div>
+
+<h2>Your Current Trip Budgets</h2>
+{% if trips %}
+    <div class="trip-list">
+    {% for trip in trips %}
+        <div class="card trip-item">
+             <div class="card-body">
+                 <div class="trip-details">
+                    <h5 class="card-title">{{ trip.trip_name }} - {{ trip.destination }}</h5>
+                    {% if trip.budget %}
+                        <p class="card-text">
+                            <strong>Total Budget:</strong> {{ trip.budget.total_budget | round(2) }}<br>
+                            <strong>Categories:</strong>
+                            <ul>
+                                {% for category, amount in trip.budget.categories.items() %}
+                                    <li>{{ category }}: {{ amount | round(2) }}</li>
+                                {% endfor %}
+                            </ul>
+                        </p>
+                    {% else %}
+                        <p class="card-text text-muted">No budget set for this trip yet.</p>
+                    {% endif %}
+                 </div>
+                 <div class="trip-actions">
+                      <a href="{{ url_for('expenses.expenses', trip_id=trip.id) }}" class="btn btn-sm btn-info">Track Expenses</a>
+                 </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+{% else %}
+    <p>You have no trips planned yet. <a href="{{ url_for('itinerary.itinerary') }}">Create one first!</a></p>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+{# Optional JavaScript to dynamically add budget category fields
+<script>
+document.getElementById('add-category-btn').addEventListener('click', function() {
+    const container = document.getElementById('budget-categories');
+    const newItem = document.createElement('div');
+    newItem.classList.add('budget-category-item');
+    newItem.innerHTML = `
+        <input type="text" name="category[]" class="form-control" placeholder="Category Name" required>
+        <input type="number" name="amount[]" class="form-control" step="0.01" min="0" placeholder="Amount" required>
+        <button type="button" class="btn btn-danger btn-sm remove-category-btn">Remove</button>
+    `;
+    container.appendChild(newItem);
+
+    // Add event listener to the new remove button
+    newItem.querySelector('.remove-category-btn').addEventListener('click', function() {
+        this.closest('.budget-category-item').remove();
+    });
+});
+
+// Add event listeners to existing remove buttons (if any)
+document.querySelectorAll('.remove-category-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        this.closest('.budget-category-item').remove();
+    });
+});
+</script>
+#}
+{% endblock %}

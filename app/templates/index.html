@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body text-center">
+        <h1 class="card-title">Welcome to Travel Planner</h1>
+        <p class="card-text">Plan your next adventure with ease. Manage itineraries, budgets, and expenses all in one place.</p>
+        {% if not session.user %}
+        <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Get Started</a>
+        <a href="{{ url_for('auth.login') }}" class="btn btn-secondary">Login</a>
+        {% endif %}
+    </div>
+</div>
+
+{% if session.user and itineraries %}
+    <h2>Your Recent Trips</h2>
+    <div class="trip-list">
+        {% for trip in itineraries %}
+        <div class="card trip-item">
+            <div class="card-body">
+                <div class="trip-details">
+                    <h5 class="card-title">{{ trip.trip_name }}</h5>
+                    <p class="card-text">
+                        <strong>Destination:</strong> {{ trip.destination }}<br>
+                        <strong>Dates:</strong> {{ trip.start_date.strftime('%d %b %Y') }} - {{ trip.end_date.strftime('%d %b %Y') }}
+                    </p>
+                </div>
+                 <div class="trip-actions">
+                     <a href="{{ url_for('itinerary.edit_trip', trip_id=trip.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+                     <form action="{{ url_for('itinerary.delete_trip', trip_id=trip.id) }}" method="POST" style="display: inline;">
+                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this trip?');">Delete</button>
+                     </form>
+                 </div>
+            </div>
+        </div>
+        {% endfor %}
+         <a href="{{ url_for('itinerary.itinerary') }}" class="btn btn-info">View All Trips</a>
+    </div>
+    {% elif session.user %}
+    <p>You haven't planned any trips yet. <a href="{{ url_for('itinerary.itinerary') }}">Create your first itinerary!</a></p>
+    {% endif %}
+
+{% endblock %}

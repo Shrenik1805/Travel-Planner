@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>Edit Trip: {{ trip.trip_name }}</h1>
+
+<div class="card">
+    <div class="card-header">
+        <h2>Update Trip Details</h2>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('itinerary.edit_trip', trip_id=trip.id) }}">
+             <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="trip_name">Trip Name:</label>
+                        <input type="text" id="trip_name" name="trip_name" class="form-control" required value="{{ trip.trip_name }}">
+                    </div>
+                </div>
+                 <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="destination">Destination:</label>
+                        <input type="text" id="destination" name="destination" class="form-control" required value="{{ trip.destination }}">
+                    </div>
+                 </div>
+            </div>
+             <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="start_date">Start Date:</label>
+                        <input type="date" id="start_date" name="start_date" class="form-control" required value="{{ trip.start_date.strftime('%Y-%m-%d') }}">
+                    </div>
+                 </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="end_date">End Date:</label>
+                        <input type="date" id="end_date" name="end_date" class="form-control" required value="{{ trip.end_date.strftime('%Y-%m-%d') }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="activities">Activities (one per line):</label>
+                <textarea id="activities" name="activities" class="form-control" rows="7">{% for activity in trip.activities %}{{ activity.activity_name }}{% if not loop.last %}
+{% endif %}{% endfor %}</textarea> {# 
+ is newline #}
+            </div>
+            <button type="submit" class="btn btn-primary">Update Trip</button>
+            <a href="{{ url_for('itinerary.itinerary') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>Expense Tracker for Trip ID: {{ trip_id }}</h1>
+
+<!-- Summary Stats -->
+<div class="stats-summary card">
+    <div class="stat-item">
+        <h4>Total Budget</h4>
+        <p id="total-budget-display">${{ total_budget | round(2) }}</p>
+    </div>
+    <div class="stat-item">
+        <h4>Total Expenses</h4>
+        <p id="total-expenses-display">${{ total_expenses | round(2) }}</p>
+    </div>
+    <div class="stat-item">
+        <h4>Balance Remaining</h4>
+        <p id="balance-display">${{ balance | round(2) }}</p>
+    </div>
+</div>
+
+
+<div class="row">
+    <!-- Add Expense Form -->
+    <div class="col-md-5">
+        <div class="card">
+             <div class="card-header">
+                <h2>Add New Expense</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('expenses.expenses', trip_id=trip_id) }}">
+                     <!-- Hidden input for trip_id if needed, though it's in the URL -->
+                     <!-- <input type="hidden" name="trip_id" value="{{ trip_id }}"> -->
+                    <div class="form-group">
+                        <label for="category">Category:</label>
+                        <input type="text" id="category" name="category" class="form-control" required placeholder="e.g., Dinner, Taxi, Museum Ticket">
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Amount:</label>
+                        <input type="number" id="amount" name="amount" class="form-control" step="0.01" min="0" required placeholder="e.g., 45.50">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Expense</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expense List -->
+    <div class="col-md-7">
+         <div class="card">
+             <div class="card-header">
+                <h2>Recorded Expenses</h2>
+            </div>
+            <div class="card-body">
+                {% if expenses %}
+                    <ul class="expense-list">
+                        {% for expense in expenses %}
+                        <li class="expense-item">
+                            <div>
+                                <span class="category">{{ expense.category }}</span>
+                                <span class="text-muted">({{ expense.date.strftime('%Y-%m-%d') }})</span>
+                            </div>
+                             <span class="amount">${{ expense.amount | round(2) }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No expenses recorded for this trip yet.</p>
+                {% endif %}
+             </div>
+         </div>
+    </div>
+</div>
+
+
+<!-- Charts Section -->
+<h2>Expense Analysis</h2>
+<div class="row">
+    <div class="col-md-6">
+         <div class="card">
+            <div class="card-header">Remaining Budget vs Expenses</div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="remainingBudgetChart"></canvas>
+                </div>
+            </div>
+         </div>
+    </div>
+    <div class="col-md-6">
+         <div class="card">
+             <div class="card-header">Expense Distribution by Category</div>
+             <div class="card-body">
+                 <div class="chart-container">
+                    <canvas id="expenseDistributionChart"></canvas>
+                 </div>
+            </div>
+         </div>
+    </div>
+</div>
+
+<!-- Hidden data for charts.js -->
+<script id="expense-labels" type="application/json">{{ expense_labels | tojson }}</script>
+<script id="expense-values" type="application/json">{{ expense_values | tojson }}</script>
+<script id="total-budget" type="application/json">{{ total_budget }}</script>
+<script id="total-expenses" type="application/json">{{ total_expenses }}</script>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+{% endblock %}

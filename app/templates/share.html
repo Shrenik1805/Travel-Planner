@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>Share Itinerary via Email</h1>
+
+<div class="card">
+     <div class="card-header">
+        <h2>Compose Email</h2>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('share.share') }}">
+            <div class="form-group">
+                <label for="recipient">Recipient Email:</label>
+                <input type="email" id="recipient" name="recipient" class="form-control" required placeholder="friend@example.com">
+            </div>
+             <div class="form-group">
+                <label for="subject">Subject:</label>
+                <input type="text" id="subject" name="subject" class="form-control" required placeholder="Check out my trip plans!">
+            </div>
+             <div class="form-group">
+                <label for="trip_id">Attach Trip Details (Optional):</label>
+                <select id="trip_id" name="trip_id" class="form-control">
+                    <option value="">-- Don't attach trip details --</option>
+                    {% for trip in trips %}
+                    <option value="{{ trip.id }}">{{ trip.trip_name }} ({{ trip.destination }})</option>
+                    {% endfor %}
+                </select>
+                <small class="form-text text-muted">If selected, the trip name, destination, dates, and activities will be appended to your message.</small>
+            </div>
+             <div class="form-group">
+                <label for="message">Message:</label>
+                <textarea id="message" name="message" class="form-control" rows="6" required placeholder="Hi [Name], thought you might like to see this..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Send Email</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

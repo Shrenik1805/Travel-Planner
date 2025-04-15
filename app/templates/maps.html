@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>Your Travel Maps</h1>
+<p>View your planned trip destinations on the map.</p>
+
+<div id="map" style="height: 500px;"></div>
+
+{% if trips %}
+    <h2>Your Trips</h2>
+    <ul>
+        {% for trip in trips %}
+            <li>{{ trip.trip_name }} - {{ trip.destination }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No trips planned yet to show on the map.</p>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Initialize the map and markers for trips
+    function initMap() {
+        const defaultCenter = { lat: 28.61, lng: 77.23 }; // Default location (e.g., Delhi)
+        const map = new google.maps.Map(document.getElementById("map"), {
+            center: defaultCenter,
+            zoom: 4, // Default zoom level
+        });
+
+        {% if trips %}
+            {% for trip in trips %}
+                const tripDestination = '{{ trip.destination }}';
+                
+                // Geocode destination to get latitude and longitude
+                const geocoder = new google.maps.Geocoder();
+                geocoder.geocode({ address: tripDestination }, function(results, status) {
+                    if (status === 'OK') {
+                        const marker = new google.maps.Marker({
+                            map: map,
+                            position: results[0].geometry.location,
+                            title: '{{ trip.trip_name }} - {{ trip.destination }}'
+                        });
+
+                        const infowindow = new google.maps.InfoWindow({
+                            content: `<b>{{ trip.trip_name }}</b><br>{{ trip.destination }}`
+                        });
+
+                        marker.addListener('click', function() {
+                            infowindow.open(map, marker);
+                        });
+                    } else {
+                        console.warn(`Could not find coordinates for: ${tripDestination}`);
+                    }
+                });
+            {% endfor %}
+        {% endif %}
+    }
+</script>
+{% endblock %}

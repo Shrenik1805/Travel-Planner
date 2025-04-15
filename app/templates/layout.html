@@ -1,0 +1,63 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>{% block title %}{{ title|default("Travel Planner") }}{% endblock %}</title>  
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">  
+    <!-- Include Chart.js CDN -->  
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>  
+    <!-- Include Google Maps API -->  
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBKTQ9MSM8nMksNK7HeYzbHsgrYXB2dO4&callback=initMap&libraries=&v=weekly" async></script>  
+    {% block head_extra %}{% endblock %}  
+    <script>
+        // This function initializes the map
+        function initMap() {
+            // Default map options
+            const defaultCenter = { lat: 28.61, lng: 77.23 }; // Default location (e.g., Delhi)
+            const map = new google.maps.Map(document.getElementById("map"), {
+                center: defaultCenter,
+                zoom: 4, // Default zoom level
+            });
+
+            // Optional: Add your own logic to add markers from trips (we'll add that in the maps.html page)
+        }
+    </script>
+</head>  
+<body>  
+    <nav class="navbar">  
+        <div class="container-fluid">  
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">TravelPlanner</a>  
+            <ul class="navbar-nav">  
+                {% if session.user %}  
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('itinerary.itinerary') }}">Itinerary</a></li>  
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('budget.budget') }}">Budget</a></li>  
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('expenses.expenses') }}">Expenses</a></li>  
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('maps.maps') }}">Maps</a></li>  
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('share.share') }}">Share</a></li>  
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('settings.settings') }}">Settings</a></li>  
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a></li>  
+                {% else %}  
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Login</a></li>  
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.register') }}">Register</a></li>  
+                {% endif %}  
+                <li class="nav-item">  
+                    <button id="theme-toggle" aria-label="Toggle theme">Toggle Theme</button>  
+                </li>  
+            </ul>  
+        </div>  
+    </nav>  
+
+    <div class="container">  
+        {% block content %}  
+        {% endblock %}  
+    </div>  
+
+    <footer class="footer">  
+      <p>© 2025 Travel Planner. All rights reserved.</p>  
+    </footer>  
+
+    <script src="{{ url_for('static', filename='js/theme-toggle.js') }}"></script>  
+    {% block scripts %}{% endblock %}  
+</body>  
+</html>
