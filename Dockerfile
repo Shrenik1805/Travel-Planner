@@ -1,8 +1,10 @@
-FROM python:3.9-slim
+# Use an official Python runtime
+FROM python:3.11-slim
 
+# Set the working directory
 WORKDIR /app
 
-# Copy requirements file
+# Copy requirements first (for caching)
 COPY requirements.txt .
 
 # Install dependencies
@@ -11,12 +13,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application
 COPY . .
 
-# Set environment variables
-ENV FLASK_APP=run.py
+# Set the environment variable for Flask
+ENV FLASK_APP=app.py
 ENV FLASK_RUN_HOST=0.0.0.0
 
-# Expose the port
+# Expose the port Flask runs on
 EXPOSE 5000
 
-# Command to run the application
+# Run the app
 CMD ["flask", "run"]
